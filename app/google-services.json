@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "801950813544",
+    "firebase_url": "https://ressin-d4a55.firebaseio.com",
+    "project_id": "ressin-d4a55",
+    "storage_bucket": "ressin-d4a55.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801950813544:android:f391bb1658ed73b0",
+        "android_client_info": {
+          "package_name": "com.android.ressin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801950813544-648js83nlpvl2t3r4gf39aqj1hg104o7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.ressin",
+            "certificate_hash": "0de042bbdd38fa66125647d644f4afa237c288d3"
+          }
+        },
+        {
+          "client_id": "801950813544-pp5v6lldjfv26m5ki46q5tq28o94314a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlQ49dIigtSFTAM_ydzUSTeGYcLXAlSWc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801950813544-pp5v6lldjfv26m5ki46q5tq28o94314a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
