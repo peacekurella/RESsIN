@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -83,7 +83,6 @@ public class LoginActivity extends AppCompatActivity implements
         }
         else
         {
-            showProgressDialog();
             updateUI(false);
         }
     }
@@ -104,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements
             if(result.isSuccess())
             {
                 GoogleSignInAccount acct = result.getSignInAccount();
+                Toast.makeText(this, "Signing In", Toast.LENGTH_SHORT).show();
                 firebaseAuthWithGooogle(acct);
             }
             else
@@ -127,6 +127,7 @@ public class LoginActivity extends AppCompatActivity implements
     // [START handleSignInResult]
     private void firebaseAuthWithGooogle(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(),null);
+        showProgressDialog();
         mAuth.signInWithCredential(credential)
                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                    @Override
@@ -134,10 +135,12 @@ public class LoginActivity extends AppCompatActivity implements
                        if(task.isSuccessful())
                        {
                            updateUI(true);
+                           hideProgressDialog();
                        }
                        else
                        {
                            updateUI(false);
+                           hideProgressDialog();
                            Toast.makeText(getApplicationContext(),"Sign in failed",Toast.LENGTH_SHORT).show();
                        }
                    }
@@ -149,7 +152,7 @@ public class LoginActivity extends AppCompatActivity implements
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+
     }
 
     @Override
@@ -178,7 +181,6 @@ public class LoginActivity extends AppCompatActivity implements
 
     private void updateUI(boolean signedIn) {
         if (signedIn) {
-            finishActivity(0);
             startActivity(new Intent(this , HomeActivity.class));
         }
         else {
@@ -191,7 +193,6 @@ public class LoginActivity extends AppCompatActivity implements
         switch (v.getId()) {
             case R.id.sign_in_button:
                 signIn();
-                showProgressDialog();
                 break;
         }
     }

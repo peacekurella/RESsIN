@@ -1,16 +1,14 @@
 package com.android.ressin;
 
+import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -73,7 +71,7 @@ public class ToDoFragment extends Fragment {
 
     private void initSearch(View RootView) {
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) RootView.findViewById(R.id.search_bar);
+        SearchView searchView = RootView.findViewById(R.id.search_bar);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(),SearchableActivity.class)));
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(true);
@@ -108,7 +106,7 @@ public class ToDoFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    protected interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
     }
 }

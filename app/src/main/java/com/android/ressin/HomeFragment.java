@@ -1,17 +1,13 @@
 package com.android.ressin;
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.app.SearchManager;
-import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.SearchView;
 
 
@@ -37,12 +33,6 @@ public class HomeFragment extends Fragment  {
 
     public HomeFragment() {
         // Required empty public constructor
-    }
-
-
-    public interface OnFragmentInteractionListener
-    {
-
     }
 
     /**
@@ -82,30 +72,35 @@ public class HomeFragment extends Fragment  {
                     + " must implement OnFragmentInteractionListener");
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) rootView.findViewById(R.id.search_bar);
+        SearchView searchView = rootView.findViewById(R.id.search_bar);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(),SearchableActivity.class)));
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(true);
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
 
+    // TODO: Rename method, update argument and hook method into UI event
+
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    protected interface OnFragmentInteractionListener {
+
     }
 
     /**

@@ -1,9 +1,7 @@
 package com.android.ressin;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,7 +62,7 @@ implements GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigat
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
@@ -78,7 +75,7 @@ implements GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigat
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         switch(item.getItemId()) {
             case R.id.sign_out:
                 signOut();
@@ -106,10 +103,10 @@ implements GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigat
 
     private void initDrawer()
     {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_drawer);
+        NavigationView navigationView = findViewById(R.id.nav_drawer);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
-        ImageView imageView = (ImageView) header.findViewById(R.id.user_pic);
+        ImageView imageView = header.findViewById(R.id.user_pic);
         if(mUser.getPhotoUrl()!=null)
             Picasso.with(this).load(mUser.getPhotoUrl())
                     .transform(new CircleTransform()).
@@ -118,7 +115,7 @@ implements GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigat
         TextView email = header.findViewById(R.id.user_email);
         name.setText(mUser.getDisplayName());
         email.setText(mUser.getEmail());
-        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
