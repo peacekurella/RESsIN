@@ -1,22 +1,22 @@
-<RelativeLayout android:background="@color/white"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginRight="8dp"
     android:layout_marginBottom="8dp"
     android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
     android:layout_marginTop="8dp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <SearchView
         android:id="@id/search_bar"
         android:layout_width="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
         android:layout_height="48dp"
         android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:background="@color/white"
         android:elevation="8dp"
@@ -25,8 +25,8 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
     </ListView>
 
@@ -34,15 +34,16 @@
         android:id="@+id/fab"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:layout_alignEnd="@+id/search_bar"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginLeft="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:backgroundTint="@color/white"
         android:elevation="8dp"
         android:src="@drawable/ic_add_black_48dp"
-        app:fabSize="normal"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/search_bar"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp" />
+        app:borderWidth="0dp"
+        app:fabSize="normal" />
 
 </RelativeLayout>
