@@ -5,10 +5,13 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,7 +21,8 @@ import android.widget.SearchView;
  * Use the {@link ToDoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ToDoFragment extends Fragment {
+public class ToDoFragment extends Fragment implements
+        View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -27,6 +31,10 @@ public class ToDoFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String[] myDataset = {"CARD 1", "Card 2", "Card 3", "CARD 1", "Card 2", "Card 3"};
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,6 +74,19 @@ public class ToDoFragment extends Fragment {
                              Bundle savedInstanceState) {
         View RootView = inflater.inflate(R.layout.fragment_todo,container,false);
         initSearch(RootView);
+        RootView.findViewById(R.id.fab).setOnClickListener(this);
+        mRecyclerView = RootView.findViewById(R.id.my_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // specify an adapter (see also next example)
+        mAdapter = new CardAdapter(myDataset, getActivity(), new CustomItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Toast.makeText(getContext(), "Clicked on " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
         return RootView;
     }
 
@@ -94,6 +115,22 @@ public class ToDoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab:
+                genCard();
+                break;
+
+            default:
+                Toast.makeText(getContext(), "CLICKED", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void genCard() {
+
     }
 
     /**
