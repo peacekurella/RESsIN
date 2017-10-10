@@ -7,17 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by prashanth kurella on 10/7/2017.
  */
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
-    private String[] mDataset;
+    private List<String> mDataset;
     private Context mContext;
     private CustomItemClickListener listener;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public CardAdapter(String[] myDataset, Context context, CustomItemClickListener listener) {
+    public CardAdapter(List<String> myDataset, Context context, CustomItemClickListener listener) {
         mDataset = myDataset;
         this.listener = listener;
         mContext = context;
@@ -37,6 +39,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 listener.onItemClick(v, mViewHolder.getPosition());
             }
         });
+
         return mViewHolder;
     }
 
@@ -45,13 +48,13 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     public void onBindViewHolder(CardViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.vText.setText(mDataset[position]);
+        holder.vText.setText(mDataset.get(position));
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
 
     // Provide a reference to the views for each data item
@@ -63,6 +66,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         public CardViewHolder(View v) {
             super(v);
             vText = v.findViewById(R.id.info_text);
+
         }
 
     }

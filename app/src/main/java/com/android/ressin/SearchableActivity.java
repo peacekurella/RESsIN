@@ -10,6 +10,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +30,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by prashanth kurella on 9/29/2017.
  */
@@ -35,11 +40,16 @@ import com.squareup.picasso.Picasso;
 public class SearchableActivity extends AppCompatActivity
 implements GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigationItemSelectedListener
     ,ResultFragment.OnFragmentInteractionListener , HomeFragment.OnFragmentInteractionListener ,
-        ToDoFragment.OnFragmentInteractionListener
+        ToDoFragment.OnFragmentInteractionListener, TextDialogFragment.NoticeDialogListener
 {
     private String TAG = "SeachableActivity";
     private GoogleApiClient mGoogleApiClient;
     private FirebaseUser mUser;
+    private List<String> myDataset = new ArrayList<String>();
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private int position = 0;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,5 +187,30 @@ implements GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigat
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    public void genCard(String input) {
+        mRecyclerView = findViewById(R.id.my_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        myDataset.add(input);
+        position++;
+        mAdapter = new CardAdapter(myDataset, this, new CustomItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Toast.makeText(getApplicationContext(), "Clicked on " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onDialogPositiveClick(String input) {
+        genCard(input);
+    }
+
+    @Override
+    public void onDialogNegativeClick(TextDialogFragment dialog) {
+        dialog.getDialog().cancel();
     }
 }

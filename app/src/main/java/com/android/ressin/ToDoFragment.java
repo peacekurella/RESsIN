@@ -1,5 +1,6 @@
 package com.android.ressin;
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -31,11 +34,11 @@ public class ToDoFragment extends Fragment implements
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private String[] myDataset = {"CARD 1", "Card 2", "Card 3", "CARD 1", "Card 2", "Card 3"};
+    private List<String> myDataset = new ArrayList<String>();
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-
+    private int position = 0;
     private OnFragmentInteractionListener mListener;
 
     public ToDoFragment() {
@@ -121,16 +124,14 @@ public class ToDoFragment extends Fragment implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                genCard();
+                genDialog();
                 break;
-
-            default:
-                Toast.makeText(getContext(), "CLICKED", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void genCard() {
-
+    private void genDialog() {
+        DialogFragment fragment = new TextDialogFragment();
+        fragment.show(getFragmentManager(), "Input");
     }
 
     /**

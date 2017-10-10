@@ -9,6 +9,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -26,13 +28,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomeActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigationItemSelectedListener
     , HomeFragment.OnFragmentInteractionListener , ToDoFragment.OnFragmentInteractionListener
+        , TextDialogFragment.NoticeDialogListener
 {
     private static final String TAG = "HomeActivity";
     private GoogleApiClient mGoogleApiClient;
     private FirebaseUser mUser;
+    private List<String> myDataset = new ArrayList<String>();
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private int position = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,6 +176,31 @@ public class HomeActivity extends AppCompatActivity implements
                 break;
         }
         return true;
+    }
+
+    public void genCard(String input) {
+        mRecyclerView = findViewById(R.id.my_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        myDataset.add(input);
+        position++;
+        mAdapter = new CardAdapter(myDataset, this, new CustomItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Toast.makeText(getApplicationContext(), "Clicked on " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onDialogPositiveClick(String input) {
+        genCard(input);
+    }
+
+    @Override
+    public void onDialogNegativeClick(TextDialogFragment dialog) {
+        dialog.getDialog().cancel();
     }
 
 }
