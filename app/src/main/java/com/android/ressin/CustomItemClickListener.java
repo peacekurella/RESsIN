@@ -8,4 +8,12 @@ import android.view.View;
 
 public interface CustomItemClickListener {
     void onItemClick(View v, int position);
+
+    void onTextFieldClick(View view);
+
+    void editClicked(int postion);
+
+    void deleteClicked(int position);
+
+    void shiftClicked(int position);
 }

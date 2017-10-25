@@ -12,8 +12,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -28,37 +35,28 @@ public class ToDoFragment extends Fragment implements
         View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "data";
+    private static final String ARG_PARAM2 = "position";
+    private static final String TAG = "ToDoFragment";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private List<String> myDataset = new ArrayList<String>();
+    private List<ToDoObject> myDataset = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private int position = 0;
     private OnFragmentInteractionListener mListener;
+    private DatabaseReference mDatabase;
 
     public ToDoFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ToDoFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static ToDoFragment newInstance(String param1, String param2) {
+    public static ToDoFragment newInstance(List<ToDoObject> data) {
         ToDoFragment fragment = new ToDoFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PARAM1, (Serializable) data);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,10 +64,7 @@ public class ToDoFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -81,22 +76,59 @@ public class ToDoFragment extends Fragment implements
         mRecyclerView = RootView.findViewById(R.id.my_recycler_view);
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        // specify an adapter (see also next example)
-        mAdapter = new CardAdapter(myDataset, getActivity(), new CustomItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                Toast.makeText(getContext(), "Clicked on " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
-        mRecyclerView.setAdapter(mAdapter);
         return RootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener dataListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                myDataset.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    myDataset.add(new ToDoObject(ds.getKey(), ds.getValue(String.class)));
+
+                }
+                CardAdapter dAdapter = new CardAdapter(myDataset, getContext(), new CustomItemClickListener() {
+                    @Override
+                    public void onItemClick(View v, int position) {
+
+                    }
+
+                    @Override
+                    public void onTextFieldClick(View view) {
+
+                    }
+
+                    @Override
+                    public void editClicked(int position) {
+
+                    }
+
+                    @Override
+                    public void deleteClicked(int position) {
+                    }
+
+                    @Override
+                    public void shiftClicked(int position) {
+
+                    }
+                });
+                mRecyclerView.setAdapter(dAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        mDatabase.child("ToDo").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(dataListener);
+    }
     private void initSearch(View RootView) {
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = RootView.findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(),SearchableActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(true);
     }
@@ -144,7 +176,7 @@ public class ToDoFragment extends Fragment implements
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    protected interface OnFragmentInteractionListener {
+    interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
     }
 }

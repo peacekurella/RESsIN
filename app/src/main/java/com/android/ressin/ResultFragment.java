@@ -46,8 +46,6 @@ public class ResultFragment extends Fragment {
     public static ResultFragment newInstance(String param1, String param2) {
         ResultFragment fragment = new ResultFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,7 +70,7 @@ public class ResultFragment extends Fragment {
     private void initSearch(View RootView) {
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = RootView.findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(),SearchableActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(true);
     }
@@ -107,7 +105,7 @@ public class ResultFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    protected interface OnFragmentInteractionListener {
+    interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
 
     }

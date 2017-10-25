@@ -11,8 +11,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/ThemeOverlay.MyNoTitleActivity"
             android:noHistory="true"
+            android:theme="@style/ThemeOverlay.MyNoTitleActivity"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,21 +20,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchableActivity">
+
+        <activity
+            android:name=".HomeActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-        </activity>
-        <activity android:name=".HomeActivity" android:noHistory="true">
-
             <!-- enable the search dialog to send searches to SearchableActivity -->
             <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchableActivity" />
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                android:value=".HomeActivity" />
         </activity>
 
     </application>

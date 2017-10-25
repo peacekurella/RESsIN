@@ -9,8 +9,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -26,37 +25,47 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigationItemSelectedListener
     , HomeFragment.OnFragmentInteractionListener , ToDoFragment.OnFragmentInteractionListener
-        , TextDialogFragment.NoticeDialogListener
+        , TextDialogFragment.NoticeDialogListener, ResultFragment.OnFragmentInteractionListener
 {
     private static final String TAG = "HomeActivity";
     private GoogleApiClient mGoogleApiClient;
     private FirebaseUser mUser;
-    private List<String> myDataset = new ArrayList<String>();
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private int position = 0;
+    private DatabaseReference mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
-        Fragment fragment = new HomeFragment();
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.Main_content,fragment)
-                .commit();
+        mDatabase = FirebaseDatabase.getInstance().getReference("ToDo");
+        mDatabase.setValue(mUser.getUid());
+        Log.e(TAG, mUser.getUid());
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            Fragment fragment = new ResultFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.Main_content, fragment)
+                    .commit();
+
+        } else {
+            Fragment fragment = new HomeFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.Main_content, fragment)
+                    .commit();
+        }
         initClient();
         initDrawer();
+
     }
+
 
     private void initDrawer()
     {
@@ -77,7 +86,7 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 if (drawerView != null) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(drawerView.getWindowToken(), 0);
                 }
             }
@@ -130,6 +139,7 @@ public class HomeActivity extends AppCompatActivity implements
                 });
     }
 
+    @NonNull
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
@@ -179,18 +189,10 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     public void genCard(String input) {
-        mRecyclerView = findViewById(R.id.my_recycler_view);
-        mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        myDataset.add(input);
-        position++;
-        mAdapter = new CardAdapter(myDataset, this, new CustomItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                Toast.makeText(getApplicationContext(), "Clicked on " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
-        mRecyclerView.setAdapter(mAdapter);
+        mDatabase.child(mUser.getUid())
+                .push()
+                .setValue(input);
+        Log.e(TAG, "YOLO");
     }
 
     @Override
@@ -202,5 +204,6 @@ public class HomeActivity extends AppCompatActivity implements
     public void onDialogNegativeClick(TextDialogFragment dialog) {
         dialog.getDialog().cancel();
     }
+
 
 }

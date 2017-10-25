@@ -80,7 +80,7 @@ public class HomeFragment extends Fragment  {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = rootView.findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(),SearchableActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(true);
         return rootView;
@@ -99,19 +99,9 @@ public class HomeFragment extends Fragment  {
         mListener = null;
     }
 
-    protected interface OnFragmentInteractionListener {
+    interface OnFragmentInteractionListener {
 
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
 
 }
