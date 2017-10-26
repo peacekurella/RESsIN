@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -47,7 +49,6 @@ public class ToDoFragment extends Fragment implements
     private RecyclerView.LayoutManager mLayoutManager;
     private OnFragmentInteractionListener mListener;
     private DatabaseReference mDatabase;
-
     public ToDoFragment() {
         // Required empty public constructor
     }
@@ -98,21 +99,35 @@ public class ToDoFragment extends Fragment implements
                     }
 
                     @Override
-                    public void onTextFieldClick(View view) {
+                    public void onTextFieldClick(TextView view) {
 
                     }
 
                     @Override
-                    public void editClicked(int position) {
-
+                    public void editClicked(final int position, TextView tv) {
+                        tv.requestFocus();
                     }
 
                     @Override
                     public void deleteClicked(int position) {
+                        mDatabase.child("ToDo")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child(myDataset.get(position).getKey())
+                                .removeValue();
                     }
 
                     @Override
                     public void shiftClicked(int position) {
+
+                    }
+
+                    @Override
+                    public void focusChange(TextView tv, int position) {
+                        ToDoObject td = new ToDoObject(myDataset.get(position).getKey(), tv.getText().toString());
+                        mDatabase.child("ToDo")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child(myDataset.get(position).getKey())
+                                .setValue(tv.getText().toString());
 
                     }
                 });
@@ -130,7 +145,7 @@ public class ToDoFragment extends Fragment implements
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = RootView.findViewById(R.id.search_bar);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
-        searchView.setIconifiedByDefault(false);
+        searchView.setIconifiedByDefault(true);
         searchView.setSubmitButtonEnabled(true);
     }
 

@@ -38,10 +38,17 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         View cardView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_view, parent, false);
         final TextView tv = cardView.findViewById(R.id.info_text);
+        final CardViewHolder mViewHolder = new CardViewHolder(cardView);
+        tv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                listener.focusChange(tv, mViewHolder.getPosition());
+            }
+        });
         tv.setOnClickListener(new View.OnClickListener() {
                                   @Override
                                   public void onClick(View view) {
-                                      listener.onTextFieldClick(view);
+                                      listener.onTextFieldClick(tv);
                                   }
                               }
         );
@@ -53,7 +60,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             }
         });
 
-        final CardViewHolder mViewHolder = new CardViewHolder(cardView);
+
         View.OnCreateContextMenuListener ctx = new View.OnCreateContextMenuListener() {
 
             private MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
@@ -61,7 +68,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case 1:
-                            listener.editClicked(mViewHolder.getPosition());
+                            listener.editClicked(mViewHolder.getPosition(), tv);
                             break;
 
                         case 2:
@@ -121,7 +128,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         public CardViewHolder(View v) {
             super(v);
             vText = v.findViewById(R.id.info_text);
-
         }
 
     }

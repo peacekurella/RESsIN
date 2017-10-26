@@ -66,7 +66,6 @@ public class TextDialogFragment extends DialogFragment {
 
     public interface NoticeDialogListener {
         void onDialogPositiveClick(String input);
-
         void onDialogNegativeClick(TextDialogFragment dialog);
     }
 
