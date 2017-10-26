@@ -78,8 +78,10 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
                 MenuItem Edit = contextMenu.add(Menu.NONE, 1, 1, "Edit");
                 MenuItem Delete = contextMenu.add(Menu.NONE, 2, 2, "Delete");
+                MenuItem ShiftUp = contextMenu.add(Menu.NONE, 3, 3, "Shift Up");
                 Edit.setOnMenuItemClickListener(onEditMenu);
                 Delete.setOnMenuItemClickListener(onEditMenu);
+                ShiftUp.setOnMenuItemClickListener(onEditMenu);
             }
         };
 

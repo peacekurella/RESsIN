@@ -9,7 +9,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -44,8 +43,6 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_drawer);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference("ToDo");
-        mDatabase.setValue(mUser.getUid());
-        Log.e(TAG, mUser.getUid());
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Fragment fragment = new ResultFragment();
@@ -192,7 +189,6 @@ public class HomeActivity extends AppCompatActivity implements
         mDatabase.child(mUser.getUid())
                 .push()
                 .setValue(input);
-        Log.e(TAG, "YOLO");
     }
 
     @Override
