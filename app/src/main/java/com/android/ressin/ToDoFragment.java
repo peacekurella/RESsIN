@@ -2,8 +2,7 @@ package com.android.ressin;
 
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.SearchManager;
-import android.content.ComponentName;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,8 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
-import android.widget.TextView;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -41,6 +40,7 @@ public class ToDoFragment extends Fragment implements
     private static final String ARG_PARAM1 = "data";
     private static final String ARG_PARAM2 = "position";
     private static final String TAG = "ToDoFragment";
+    ProgressDialog loading = null;
 
     // TODO: Rename and change types of parameters
     private List<ToDoObject> myDataset = new ArrayList<>();
@@ -73,11 +73,15 @@ public class ToDoFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View RootView = inflater.inflate(R.layout.fragment_todo,container,false);
-        initSearch(RootView);
+        //initSearch(RootView);
         RootView.findViewById(R.id.fab).setOnClickListener(this);
         mRecyclerView = RootView.findViewById(R.id.my_recycler_view);
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
+        loading = new ProgressDialog(getContext());
+        loading.setCancelable(true);
+        //loading.setMessage(Constant.Message.AuthenticatingUser);
+        loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         return RootView;
     }
 
@@ -88,24 +92,31 @@ public class ToDoFragment extends Fragment implements
         ValueEventListener dataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                loading.show();
                 myDataset.clear();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     myDataset.add(new ToDoObject(ds.getKey(), ds.getValue(String.class)));
                 }
-                CardAdapter dAdapter = new CardAdapter(myDataset, getContext(), new CustomItemClickListener() {
+                CardAdapter dAdapter = new CardAdapter(myDataset, new CustomItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int position) {
-
+                    public void onItemClick(View v, int position, EditText tv) {
+                        tv.setFocusable(true);
+                        tv.requestFocusFromTouch();
                     }
 
                     @Override
-                    public void onTextFieldClick(TextView view) {
-
+                    public void onTextFieldClick(EditText view) {
+                        view.setFocusable(true);
+                        view.requestFocusFromTouch();
                     }
 
                     @Override
-                    public void editClicked(final int position, TextView tv) {
-                        tv.requestFocus();
+                    public void editClicked(final int position, EditText tv) {
+                        tv.setFocusable(true);
+                        tv.requestFocusFromTouch();
+                        InputMethodManager imm = (InputMethodManager) getActivity()
+                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(tv, InputMethodManager.SHOW_IMPLICIT);
                     }
 
                     @Override
@@ -118,19 +129,39 @@ public class ToDoFragment extends Fragment implements
 
                     @Override
                     public void shiftClicked(int position) {
-
-                    }
-
-                    @Override
-                    public void focusChange(TextView tv, int position) {
-                        ToDoObject td = new ToDoObject(myDataset.get(position).getKey(), tv.getText().toString());
+                        String cur = myDataset.get(position).getText();
+                        String abv = myDataset.get(position - 1).getText();
+                        mDatabase.child("ToDo")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child(myDataset.get(position - 1).getKey())
+                                .setValue(cur);
                         mDatabase.child("ToDo")
                                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .child(myDataset.get(position).getKey())
-                                .setValue(tv.getText().toString());
+                                .setValue(abv);
+                    }
+
+                    @Override
+                    public void focusChange(EditText tv, int position, boolean b) {
+                        //ToDoObject td = new ToDoObject(myDataset.get(position).getKey(), tv.getText().toString());
+                        if (b) {
+                            InputMethodManager imm = (InputMethodManager) getActivity()
+                                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(tv, InputMethodManager.SHOW_IMPLICIT);
+                        } else {
+
+                            mDatabase.child("ToDo")
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(myDataset.get(position).getKey())
+                                    .setValue(tv.getText().toString());
+                            InputMethodManager imm = (InputMethodManager) getActivity()
+                                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(tv.getWindowToken(), 0);
+                        }
 
                     }
                 });
+                loading.hide();
                 mRecyclerView.setAdapter(dAdapter);
             }
 
@@ -139,14 +170,8 @@ public class ToDoFragment extends Fragment implements
                 Log.e(TAG, databaseError.toString());
             }
         };
-        mDatabase.child("ToDo").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(dataListener);
-    }
-    private void initSearch(View RootView) {
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = RootView.findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
-        searchView.setIconifiedByDefault(true);
-        searchView.setSubmitButtonEnabled(true);
+        mDatabase.child("ToDo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addValueEventListener(dataListener);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

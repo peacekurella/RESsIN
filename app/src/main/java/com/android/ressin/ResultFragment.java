@@ -1,14 +1,11 @@
 package com.android.ressin;
 
 import android.app.Fragment;
-import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,19 +60,8 @@ public class ResultFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
             View RootView =  inflater.inflate(R.layout.fragment_home,container,false);
-            initSearch(RootView);
         return RootView;
     }
-
-    private void initSearch(View RootView) {
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = RootView.findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
-        searchView.setIconifiedByDefault(false);
-        searchView.setSubmitButtonEnabled(true);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
 
 
     @Override
@@ -106,7 +92,5 @@ public class ResultFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-
     }
 }

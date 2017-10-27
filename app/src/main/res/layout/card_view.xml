@@ -26,7 +26,8 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:background="@color/white"
-            android:focusable="true"
+            android:enabled="true"
+            android:focusable="false"
             android:text="TEXT"
             android:textSize="16sp" />
 
