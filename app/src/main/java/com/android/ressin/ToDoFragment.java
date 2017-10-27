@@ -129,16 +129,18 @@ public class ToDoFragment extends Fragment implements
 
                     @Override
                     public void shiftClicked(int position) {
-                        String cur = myDataset.get(position).getText();
-                        String abv = myDataset.get(position - 1).getText();
-                        mDatabase.child("ToDo")
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child(myDataset.get(position - 1).getKey())
-                                .setValue(cur);
-                        mDatabase.child("ToDo")
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child(myDataset.get(position).getKey())
-                                .setValue(abv);
+                        if (position != 0) {
+                            String cur = myDataset.get(position).getText();
+                            String abv = myDataset.get(position - 1).getText();
+                            mDatabase.child("ToDo")
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(myDataset.get(position - 1).getKey())
+                                    .setValue(cur);
+                            mDatabase.child("ToDo")
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(myDataset.get(position).getKey())
+                                    .setValue(abv);
+                        }
                     }
 
                     @Override
