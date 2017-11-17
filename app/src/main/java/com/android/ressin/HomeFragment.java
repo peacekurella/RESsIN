@@ -3,9 +3,14 @@ package com.android.ressin;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -16,7 +21,7 @@ import android.view.ViewGroup;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment  {
+public class HomeFragment extends Fragment implements ItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -27,6 +32,8 @@ public class HomeFragment extends Fragment  {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -75,11 +82,13 @@ public class HomeFragment extends Fragment  {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        /*SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = rootView.findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), HomeActivity.class)));
-        searchView.setIconifiedByDefault(false);
-        searchView.setSubmitButtonEnabled(true); */
+        mRecyclerView = rootView.findViewById(R.id.my_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        List<ResultObj> list = new ArrayList();
+        list.add(new ResultObj("nanoscience", "https://niituniversity.in/research", "2.1 Kms Away ..."));
+        ResAdapter mAdapter = new ResAdapter(list, this);
+        mRecyclerView.setAdapter(mAdapter);
         return rootView;
     }
 
@@ -96,8 +105,14 @@ public class HomeFragment extends Fragment  {
         mListener = null;
     }
 
+    @Override
+    public void onItemClick(View v, int position) {
+        mListener.cardClicked(v, position);
+    }
+
     interface OnFragmentInteractionListener {
 
+        void cardClicked(View v, int position);
     }
 
 

@@ -58,7 +58,7 @@
     <!-- TODO(user): replace with your real server client ID -->
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
-    <string name="server_client_id">490295719205-2ddumqqje0sshevketf50ctvpuqbhrkm.apps.googleusercontent.com</string>
+    <string name="server_client_id">801950813544-648js83nlpvl2t3r4gf39aqj1hg104o7.apps.googleusercontent.com</string>
     <string name="title_activity_navigation">NavigationActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

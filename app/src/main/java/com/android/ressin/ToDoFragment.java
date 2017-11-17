@@ -92,7 +92,6 @@ public class ToDoFragment extends Fragment implements
         ValueEventListener dataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                loading.show();
                 myDataset.clear();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     myDataset.add(new ToDoObject(ds.getKey(), ds.getValue(String.class)));
@@ -163,7 +162,6 @@ public class ToDoFragment extends Fragment implements
 
                     }
                 });
-                loading.hide();
                 mRecyclerView.setAdapter(dAdapter);
             }
 

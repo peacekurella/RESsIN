@@ -9,6 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name=".MySuggestionProvider"
+            android:authorities="com.android.ressin.MySuggestionProvider" />
         <activity
             android:name=".LoginActivity"
             android:noHistory="true"
@@ -27,13 +30,16 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
             <!-- enable the search dialog to send searches to SearchableActivity -->
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
                 android:value=".HomeActivity" />
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB5Cq62yvwabiCpWdl94SPqmvvZZXOhv3E" />
 
     </application>
 

@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,7 +36,8 @@ import com.squareup.picasso.Picasso;
 public class HomeActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigationItemSelectedListener
     , HomeFragment.OnFragmentInteractionListener , ToDoFragment.OnFragmentInteractionListener
-        , TextDialogFragment.NoticeDialogListener, ResultFragment.OnFragmentInteractionListener
+        , TextDialogFragment.NoticeDialogListener, ResultFragment.OnFragmentInteractionListener,
+        MapFrag.OnFragmentInteractionListener
 {
     private static final String TAG = "HomeActivity";
     private GoogleApiClient mGoogleApiClient;
@@ -49,30 +51,41 @@ public class HomeActivity extends AppCompatActivity implements
         mDatabase = FirebaseDatabase.getInstance().getReference("ToDo");
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
             Fragment fragment = new ResultFragment();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.Main_content, fragment)
+                    .replace(R.id.Main_content, fragment, "Result Fragment")
                     .commit();
 
         } else {
             Fragment fragment = new HomeFragment();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.Main_content, fragment)
+                    .replace(R.id.Main_content, fragment, "Home Fragment")
                     .commit();
         }
+
         initClient();
         initDrawer();
         initSearch();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     private void initSearch() {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = findViewById(R.id.search_bar);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getApplicationContext(), HomeActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(
+                new ComponentName(getApplicationContext(), HomeActivity.class)));
         searchView.setIconifiedByDefault(false);
-        searchView.setSubmitButtonEnabled(true);
     }
 
     private void initDrawer()
@@ -160,6 +173,15 @@ public class HomeActivity extends AppCompatActivity implements
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (getFragmentManager()
+                .findFragmentById(R.id.Main_content)
+                .getTag().equals("Map Fragment")) {
+            Fragment fragment = new HomeFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.Main_content, fragment)
+                    .commit();
+            drawer.closeDrawer(GravityCompat.START);
         } else
         {
             super.onBackPressed();
@@ -180,7 +202,7 @@ public class HomeActivity extends AppCompatActivity implements
                 Fragment fragment = new HomeFragment();
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.Main_content,fragment)
+                        .replace(R.id.Main_content, fragment, "Home Fragment")
                         .commit();
                 drawer.closeDrawer(GravityCompat.START);
                 break;
@@ -188,9 +210,15 @@ public class HomeActivity extends AppCompatActivity implements
                 Fragment fragment1 = new ToDoFragment();
                 FragmentManager fragmentManager1 = getFragmentManager();
                 fragmentManager1.beginTransaction()
-                        .replace(R.id.Main_content,fragment1)
+                        .replace(R.id.Main_content, fragment1, "ToDo Fragment")
                         .commit();
                 drawer.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.clear:
+                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                        MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+                suggestions.clearHistory();
+                Toast.makeText(getBaseContext(), "History Cleared!", Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;
@@ -213,4 +241,12 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
 
+    @Override
+    public void cardClicked(View v, int position) {
+        Fragment fragment = new MapFrag();
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.Main_content, fragment, "Map Fragment")
+                .commit();
+    }
 }
