@@ -59,7 +59,7 @@ public class ResultFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-            View RootView =  inflater.inflate(R.layout.fragment_home,container,false);
+        View RootView = inflater.inflate(R.layout.fragment_res, container, false);
         return RootView;
     }
 

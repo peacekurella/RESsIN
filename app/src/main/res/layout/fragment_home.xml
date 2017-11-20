@@ -4,16 +4,41 @@
     android:layout_marginBottom="8dp"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="72dp"
     android:background="@color/white"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:id="@+id/ts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/Trending"
+            android:textSize="24sp"
+            android:textStyle="italic" />
+
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
+        android:id="@+id/rec"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="64dp"
         android:scrollbars="vertical" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/relativeLayout"
+        android:layout_toStartOf="@+id/relativeLayout"
+        android:alpha="0.7"
+        android:src="@drawable/ic_trending_up_white_24dp"
+        android:tint="@color/blue_grey_800" />
 
 </RelativeLayout>

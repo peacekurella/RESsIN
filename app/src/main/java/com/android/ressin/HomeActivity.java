@@ -1,15 +1,19 @@
 package com.android.ressin;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +31,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -34,46 +41,88 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 public class HomeActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener , NavigationView.OnNavigationItemSelectedListener
-    , HomeFragment.OnFragmentInteractionListener , ToDoFragment.OnFragmentInteractionListener
+        GoogleApiClient.OnConnectionFailedListener, NavigationView.OnNavigationItemSelectedListener
+        , HomeFragment.OnFragmentInteractionListener, ToDoFragment.OnFragmentInteractionListener
         , TextDialogFragment.NoticeDialogListener, ResultFragment.OnFragmentInteractionListener,
-        MapFrag.OnFragmentInteractionListener
-{
+        MapFrag.OnFragmentInteractionListener {
     private static final String TAG = "HomeActivity";
     private GoogleApiClient mGoogleApiClient;
     private FirebaseUser mUser;
     private DatabaseReference mDatabase;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private String lat;
+    private String lon;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final Intent intent = getIntent();
         setContentView(R.layout.activity_drawer);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference("ToDo");
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                    MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
-            suggestions.saveRecentQuery(query, null);
-            Fragment fragment = new ResultFragment();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.Main_content, fragment, "Result Fragment")
-                    .commit();
-
-        } else {
-            Fragment fragment = new HomeFragment();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.Main_content, fragment, "Home Fragment")
-                    .commit();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 10);
+            return;
         }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
 
+                            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                                String query = intent.getStringExtra(SearchManager.QUERY);
+                                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
+                                        MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+                                suggestions.saveRecentQuery(query, null);
+                                Fragment fragment = new ResultFragment();
+                                FragmentManager fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.Main_content, fragment, "Result Fragment")
+                                        .commit();
+
+                            } else {
+                                lat = location.getLatitude() + "";
+                                lon = location.getLongitude() + "";
+                                Fragment fragment = HomeFragment.newInstance(lat, lon);
+                                FragmentManager fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.Main_content, fragment, "Home Fragment")
+                                        .commit();
+                            }
+                        } else {
+                            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                                String query = intent.getStringExtra(SearchManager.QUERY);
+                                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
+                                        MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+                                suggestions.saveRecentQuery(query, null);
+                                Fragment fragment = new ResultFragment();
+                                FragmentManager fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.Main_content, fragment, "Result Fragment")
+                                        .commit();
+
+                            } else {
+                                Fragment fragment = new HomeFragment();
+                                FragmentManager fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.Main_content, fragment, "Home Fragment")
+                                        .commit();
+                            }
+                        }
+                    }
+                });
         initClient();
         initDrawer();
         initSearch();
 
     }
+
 
     @Override
     protected void onStart() {
@@ -86,6 +135,13 @@ public class HomeActivity extends AppCompatActivity implements
         searchView.setSearchableInfo(searchManager.getSearchableInfo(
                 new ComponentName(getApplicationContext(), HomeActivity.class)));
         searchView.setIconifiedByDefault(false);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("lat", lat);
+        outState.putString("lon", lon);
     }
 
     private void initDrawer()
@@ -191,6 +247,13 @@ public class HomeActivity extends AppCompatActivity implements
 
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        lat = savedInstanceState.getString("lat");
+        lon = savedInstanceState.getString("lon");
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         switch(item.getItemId()) {
@@ -199,7 +262,12 @@ public class HomeActivity extends AppCompatActivity implements
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 break;
             case R.id.Home:
-                Fragment fragment = new HomeFragment();
+                Fragment fragment;
+                if (lat != null && lon != null) {
+                    fragment = HomeFragment.newInstance(lat, lon);
+                } else {
+                    fragment = new HomeFragment();
+                }
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
                         .replace(R.id.Main_content, fragment, "Home Fragment")

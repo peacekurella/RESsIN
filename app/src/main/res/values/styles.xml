@@ -9,6 +9,13 @@
     <style name="ThemeOverlay.MyNoTitleActivity" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:colorPrimaryDark">@color/purple</item>
+    </style>
+
+    <style name="ThemeOverlay.MyhomeActivity" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorPrimaryDark">@color/purple</item>
     </style>
 
     <!-- Dark Buttons -->

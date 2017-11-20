@@ -60,7 +60,7 @@
          from https://console.developers.google.com/ -->
     <string name="server_client_id">801950813544-648js83nlpvl2t3r4gf39aqj1hg104o7.apps.googleusercontent.com</string>
     <string name="title_activity_navigation">NavigationActivity</string>
-
+    <string name="Trending">TRENDING SEARCHES</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
