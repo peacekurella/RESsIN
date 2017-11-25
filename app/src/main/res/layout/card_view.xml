@@ -11,6 +11,7 @@
     android:layout_marginTop="8dp"
     android:clickable="true"
     android:elevation="8dp"
+    android:focusable="true"
     card_view:cardCornerRadius="4dp">
 
     <RelativeLayout

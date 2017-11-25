@@ -3,7 +3,6 @@ package com.android.ressin;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -57,11 +56,6 @@ public class TextDialogFragment extends DialogFragment {
             throw new ClassCastException(getActivity().toString()
                     + " must implement NoticeDialogListener");
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
     }
 
     public interface NoticeDialogListener {

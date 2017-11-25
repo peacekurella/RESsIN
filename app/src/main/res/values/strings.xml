@@ -71,5 +71,6 @@
     <string name="typet">TYPE TEXT HERE</string>
     <string name="create">create</string>
     <string name="cancel">cancel</string>
+    <string name="waitL">waiting for GPS ...</string>
 
 </resources>

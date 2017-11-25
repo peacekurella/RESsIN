@@ -9,6 +9,8 @@ public class ResultObj {
     String title;
     String link;
     String distance;
+    String lat;
+    String lon;
 
     public ResultObj(String title, String link, String location) {
         this.title = title;
@@ -17,6 +19,22 @@ public class ResultObj {
     }
 
     public ResultObj() {
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getLon() {
+        return lon;
+    }
+
+    public void setLon(String lon) {
+        this.lon = lon;
     }
 
     public String getTitle() {

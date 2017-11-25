@@ -3,9 +3,16 @@ package com.android.ressin;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.firebase.database.DatabaseReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,15 +23,14 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ResultFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String Lat = "Lat";
     private static final String Lon = "Lon";
-
-    // TODO: Rename and change types of parameters
     private String lat;
     private String lon;
-
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
+    private List<ResultObj> myDataset = new ArrayList<>();
+    private DatabaseReference mDatabase;
     private OnFragmentInteractionListener mListener;
 
     public ResultFragment() {
@@ -54,6 +60,9 @@ public class ResultFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View RootView = inflater.inflate(R.layout.fragment_res, container, false);
+        mRecyclerView = RootView.findViewById(R.id.rec);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
         return RootView;
     }
 

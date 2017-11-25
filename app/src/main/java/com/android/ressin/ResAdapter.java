@@ -40,7 +40,10 @@ public class ResAdapter extends RecyclerView.Adapter<ResAdapter.ResViewHolder> {
     @Override
     public void onBindViewHolder(ResViewHolder holder, int position) {
         holder.tText.setText(mDataset.get(position).getTitle());
-        holder.dText.setText(mDataset.get(position).getDistance());
+        if (!mDataset.get(position).getDistance().equals("waiting for GPS ..."))
+            holder.dText.setText(mDataset.get(position).getDistance() + " Kms away ...");
+        else
+            holder.dText.setText(mDataset.get(position).getDistance());
         holder.lText.setText(mDataset.get(position).getLink());
     }
 
