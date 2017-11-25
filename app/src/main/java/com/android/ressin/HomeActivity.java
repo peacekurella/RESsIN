@@ -1,6 +1,7 @@
 package com.android.ressin;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
@@ -9,8 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -32,8 +36,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -42,7 +44,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,6 +56,8 @@ public class HomeActivity extends AppCompatActivity implements
     private static final String TAG = "HomeActivity";
     String Lat = "Lat";
     String Lon = "Lon";
+    LocationManager locationManager;
+    LocationListener locationListener;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseUser mUser;
     private DatabaseReference mDatabase;
@@ -69,76 +72,92 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_drawer);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference("ToDo");
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, 10);
-        }
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            lat = location.getLatitude() + "";
-                            lon = location.getLongitude() + "";
-                            FileOutputStream outputStream;
-                            try {
-                                outputStream = openFileOutput(Lat, Context.MODE_PRIVATE);
-                                outputStream.write(lat.getBytes());
-                                outputStream = openFileOutput(Lon, Context.MODE_PRIVATE);
-                                outputStream.write(lon.getBytes());
-                                outputStream.close();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                                String query = intent.getStringExtra(SearchManager.QUERY);
-                                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
-                                        MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
-                                suggestions.saveRecentQuery(query, null);
-                                Fragment fragment = new ResultFragment();
-                                FragmentManager fragmentManager = getFragmentManager();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.Main_content, fragment, "Result Fragment")
-                                        .commit();
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (location != null) {
+                    lat = location.getLatitude() + "";
+                    lon = location.getLongitude() + "";
+                    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                        String query = intent.getStringExtra(SearchManager.QUERY);
+                        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
+                                MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+                        suggestions.saveRecentQuery(query, null);
+                        Fragment fragment = new ResultFragment();
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.Main_content, fragment, "Result Fragment")
+                                .commit();
 
-                            } else {
-                                Fragment fragment = HomeFragment.newInstance(lat, lon);
-                                FragmentManager fragmentManager = getFragmentManager();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.Main_content, fragment, "Home Fragment")
-                                        .commit();
-                            }
-                        } else {
-                            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                                String query = intent.getStringExtra(SearchManager.QUERY);
-                                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
-                                        MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
-                                suggestions.saveRecentQuery(query, null);
-                                Fragment fragment = new ResultFragment();
-                                FragmentManager fragmentManager = getFragmentManager();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.Main_content, fragment, "Result Fragment")
-                                        .commit();
-
-                            } else {
-                                Fragment fragment = new HomeFragment();
-                                FragmentManager fragmentManager = getFragmentManager();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.Main_content, fragment, "Home Fragment")
-                                        .commit();
-                            }
-                        }
+                    } else {
+                        Fragment fragment = HomeFragment.newInstance(lat, lon);
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.Main_content, fragment, "Home Fragment")
+                                .commit();
                     }
-                });
+                } else {
+                    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                        String query = intent.getStringExtra(SearchManager.QUERY);
+                        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
+                                MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+                        suggestions.saveRecentQuery(query, null);
+                        Fragment fragment = new ResultFragment();
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.Main_content, fragment, "Result Fragment")
+                                .commit();
+
+                    } else {
+                        Fragment fragment = new HomeFragment();
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.Main_content, fragment, "Home Fragment")
+                                .commit();
+                    }
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Intent set = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        };
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission
+                        (this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET}, 10);
+            return;
+        }
+        locationManager.requestLocationUpdates("gps", 100000, 1000, locationListener);
         initClient();
         initDrawer();
         initSearch();
 
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 10:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    locationManager.requestLocationUpdates("gps", 100000, 1000, locationListener);
+        }
     }
 
     private void initSearch() {
@@ -197,7 +216,6 @@ public class HomeActivity extends AppCompatActivity implements
                 .requestIdToken(getString(R.string.default_web_client_id ))
                 .build();
         // [END configure_signin]
-
         // [START build_client]
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
@@ -231,14 +249,12 @@ public class HomeActivity extends AppCompatActivity implements
     public void onBackPressed()
     {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        String fragTag = getFragmentManager()
+                .findFragmentById(R.id.Main_content)
+                .getTag();
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if (getFragmentManager()
-                .findFragmentById(R.id.Main_content)
-                .getTag().equals("Map Fragment") || getFragmentManager()
-                .findFragmentById(R.id.Main_content).getTag().equals("Result Fragment")) {
-            lat = readFromFile(getBaseContext(), Lat);
-            lon = readFromFile(getBaseContext(), Lon);
+        } else if (fragTag.equals("Map Fragment")) {
             Fragment fragment;
             if (lat != null) {
                 fragment = HomeFragment.newInstance(lat, lon);
@@ -261,8 +277,6 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        lat = readFromFile(getBaseContext(), Lat);
-        lon = readFromFile(getBaseContext(), Lon);
         switch(item.getItemId()) {
             case R.id.sign_out:
                 signOut();

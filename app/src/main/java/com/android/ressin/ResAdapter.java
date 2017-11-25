@@ -34,7 +34,6 @@ public class ResAdapter extends RecyclerView.Adapter<ResAdapter.ResViewHolder> {
                 listener.onItemClick(v, mViewHolder.getPosition());
             }
         });
-
         return mViewHolder;
     }
 

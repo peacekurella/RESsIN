@@ -10,5 +10,4 @@ public interface ItemClickListener {
 
     void onItemClick(View v, int position);
 
-
 }
