@@ -18,13 +18,11 @@
 
         <ImageView
             android:id="@+id/google_icon"
-            android:layout_width="256dp"
-            android:layout_height="256dp"
+            android:layout_width="237dp"
+            android:layout_height="223dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="@dimen/g_top_margin"
-            android:contentDescription="@string/desc_google_icon"
-            android:src="@drawable/logo"
-            />
+            android:src="@drawable/logo" />
 
         <TextView
             android:id="@+id/status"
@@ -41,9 +39,7 @@
             android:layout_height="wrap_content"
             android:fadeScrollbars="true"
             android:gravity="center"
-            android:maxLines="5"
             android:padding="10dp"
-            android:scrollbars="vertical"
             android:text="RESsIN"
             android:textColor="@color/blue_grey_800"
             android:textSize="56dp"
@@ -66,34 +62,6 @@
             android:layout_centerVertical="true"
             android:visibility="visible"
             tools:visibility="visible" />
-
-        <LinearLayout
-            android:id="@+id/sign_out_and_disconnect"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:visibility="gone"
-            tools:visibility="gone">
-
-            <Button
-                android:id="@+id/sign_out_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/sign_out"
-                android:theme="@style/ThemeOverlay.MyDarkButton" />
-
-            <Button
-                android:id="@+id/disconnect_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/disconnect"
-                android:theme="@style/ThemeOverlay.MyDarkButton" />
-        </LinearLayout>
 
     </RelativeLayout>
 

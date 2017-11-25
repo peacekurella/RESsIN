@@ -40,18 +40,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class HomeActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, NavigationView.OnNavigationItemSelectedListener
         , HomeFragment.OnFragmentInteractionListener, ToDoFragment.OnFragmentInteractionListener
         , TextDialogFragment.NoticeDialogListener, ResultFragment.OnFragmentInteractionListener,
         MapFrag.OnFragmentInteractionListener {
     private static final String TAG = "HomeActivity";
+    String Lat = "Lat";
+    String Lon = "Lon";
     private GoogleApiClient mGoogleApiClient;
     private FirebaseUser mUser;
     private DatabaseReference mDatabase;
     private FusedLocationProviderClient mFusedLocationClient;
     private String lat;
     private String lon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,22 +69,32 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_drawer);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference("ToDo");
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
                         PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION}, 10);
-            return;
         }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-
+                            lat = location.getLatitude() + "";
+                            lon = location.getLongitude() + "";
+                            FileOutputStream outputStream;
+                            try {
+                                outputStream = openFileOutput(Lat, Context.MODE_PRIVATE);
+                                outputStream.write(lat.getBytes());
+                                outputStream = openFileOutput(Lon, Context.MODE_PRIVATE);
+                                outputStream.write(lon.getBytes());
+                                outputStream.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                                 String query = intent.getStringExtra(SearchManager.QUERY);
                                 SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
@@ -87,8 +107,6 @@ public class HomeActivity extends AppCompatActivity implements
                                         .commit();
 
                             } else {
-                                lat = location.getLatitude() + "";
-                                lon = location.getLongitude() + "";
                                 Fragment fragment = HomeFragment.newInstance(lat, lon);
                                 FragmentManager fragmentManager = getFragmentManager();
                                 fragmentManager.beginTransaction()
@@ -123,25 +141,12 @@ public class HomeActivity extends AppCompatActivity implements
 
     }
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
     private void initSearch() {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = findViewById(R.id.search_bar);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(
                 new ComponentName(getApplicationContext(), HomeActivity.class)));
         searchView.setIconifiedByDefault(false);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("lat", lat);
-        outState.putString("lon", lon);
     }
 
     private void initDrawer()
@@ -220,7 +225,6 @@ public class HomeActivity extends AppCompatActivity implements
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-
     }
 
     @Override
@@ -231,8 +235,16 @@ public class HomeActivity extends AppCompatActivity implements
             drawer.closeDrawer(GravityCompat.START);
         } else if (getFragmentManager()
                 .findFragmentById(R.id.Main_content)
-                .getTag().equals("Map Fragment")) {
-            Fragment fragment = new HomeFragment();
+                .getTag().equals("Map Fragment") || getFragmentManager()
+                .findFragmentById(R.id.Main_content).getTag().equals("Result Fragment")) {
+            lat = readFromFile(getBaseContext(), Lat);
+            lon = readFromFile(getBaseContext(), Lon);
+            Fragment fragment;
+            if (lat != null) {
+                fragment = HomeFragment.newInstance(lat, lon);
+            } else {
+                fragment = new HomeFragment();
+            }
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.Main_content, fragment)
@@ -247,15 +259,10 @@ public class HomeActivity extends AppCompatActivity implements
 
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        lat = savedInstanceState.getString("lat");
-        lon = savedInstanceState.getString("lon");
-    }
-
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        lat = readFromFile(getBaseContext(), Lat);
+        lon = readFromFile(getBaseContext(), Lon);
         switch(item.getItemId()) {
             case R.id.sign_out:
                 signOut();
@@ -308,6 +315,31 @@ public class HomeActivity extends AppCompatActivity implements
         dialog.getDialog().cancel();
     }
 
+    private String readFromFile(Context context, String filename) {
+
+        String ret = null;
+
+        try {
+            InputStream inputStream = context.openFileInput(filename);
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString);
+                }
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+
+        }
+
+        return ret;
+    }
 
     @Override
     public void cardClicked(View v, int position) {

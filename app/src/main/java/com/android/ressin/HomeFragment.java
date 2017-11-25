@@ -157,5 +157,4 @@ public class HomeFragment extends Fragment implements ItemClickListener {
         void cardClicked(View v, int position);
     }
 
-
 }
