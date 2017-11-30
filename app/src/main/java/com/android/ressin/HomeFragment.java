@@ -53,7 +53,8 @@ import java.util.List;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements ItemClickListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class HomeFragment extends Fragment implements
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private static final String Lat = "Lat";
     private static final String Lon = "Lon";
@@ -121,7 +122,7 @@ public class HomeFragment extends Fragment implements ItemClickListener, GoogleA
                     ResAdapter adapter = new ResAdapter(myDataset, new ItemClickListener() {
                         @Override
                         public void onItemClick(View v, int position) {
-                            mListener.cardClicked(v, position);
+                            mListener.cardClicked(v, myDataset.get(position));
                         }
                     });
                     mRecyclerView.setAdapter(adapter);
@@ -168,7 +169,7 @@ public class HomeFragment extends Fragment implements ItemClickListener, GoogleA
 
     public void settingsrequest() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(100 * 1000);
         locationRequest.setFastestInterval(50 * 1000);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -249,7 +250,7 @@ public class HomeFragment extends Fragment implements ItemClickListener, GoogleA
                 ResAdapter adapter = new ResAdapter(myDataset, new ItemClickListener() {
                     @Override
                     public void onItemClick(View v, int position) {
-                        mListener.cardClicked(v, position);
+                        mListener.cardClicked(v, myDataset.get(position));
                     }
                 });
                 mRecyclerView.setAdapter(adapter);
@@ -293,10 +294,6 @@ public class HomeFragment extends Fragment implements ItemClickListener, GoogleA
         mListener = null;
     }
 
-    @Override
-    public void onItemClick(View v, int position) {
-        mListener.cardClicked(v, position);
-    }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -314,7 +311,7 @@ public class HomeFragment extends Fragment implements ItemClickListener, GoogleA
     }
 
     interface OnFragmentInteractionListener {
-        void cardClicked(View v, int position);
+        void cardClicked(View v, ResultObj obj);
     }
 
 }

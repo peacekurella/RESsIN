@@ -240,8 +240,8 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void cardClicked(View v, int position) {
-        Fragment fragment = new MapFrag();
+    public void cardClicked(View v, ResultObj obj) {
+        Fragment fragment = MapFrag.newInstance("-1", "-1", obj.getLat(), obj.getLon());
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.Main_content, fragment, "Map Fragment")
